@@ -1,0 +1,116 @@
+##Задана рекуррентная функция. Область определения функции – натуральные числа. Написать программу сравнительного
+##вычисления данной функции рекурсивно и итерационно. Определить (смоделировать) границы применимости рекурсивного
+##и итерационного подхода. Результаты сравнительного исследования времени вычисления представить в табличной и
+##графической форме в виде отчета по лабораторной работе.
+##29. F(1) = F(2) = -100, F(n) = F(n-2)*(n-1), при четных n > 1, F(n) =(n-1)! при нечетных n > 1
+
+def recursive_1(n, F=-100): #рекурсивная функция F(n)=F(n-2)*(n-1)
+    if n==2:
+        return -100
+    if n>2 and n%2==0:
+        return recursive_1(n-2)*(n-1)
+def recursive_2(n): #рекурсивная функция F(n)=(n-1)!
+    if n==0:
+        return 1
+    return recursive_2(n-1)*n
+def iter_1(n, F=-100): #итеративная функция F(n)=F(n-2)*(n-1)
+    for i in range(4, n+1, 2):
+        F=F*(i-1)
+    return F
+def iter_2(n, k=1): #итеративная функция F(n)=(n-1!
+    for i in range(1, n):
+        k=k*i
+    return k
+import time
+from matplotlib import pyplot as plt 
+n=int(input("Введите натуральное число n>2 (при n=1, n=2 F(n)=-100): "))
+F=-100
+arr_rec=[] #списки для создания таблицы
+arr_iter=[]
+arr_times_rec=[]
+arr_times_iter=[]
+n_values=[]
+if n<=500: #шаг для более быстрого подсчета и наглядного вывода сравнительной таблицы и графиков
+    p=2
+if n>500 and n<=1100:
+    p=20
+if n>1100:
+    p=100
+start_iterative=time.time()
+if n>2 and n%2!=0: #если n - нечетное, ищем значение F(n)=(n-1!
+    n_values=list(range(3, n+1, p))
+    print("n - нечетное. Вычисляется значение функции F(n)=(n-1)!")
+    F=iter_2(n)
+    end_iterative=time.time()
+    print("Результат вычисления функции с использованием итерации: ", F, "\nВремя работы: ", end_iterative-start_iterative)
+    for i in range(3, n+1, p):
+        start_iter2=time.time()
+        f=iter_2(i)
+        end_iter2=time.time()
+        arr_times_iter.append(end_iter2-start_iter2)
+        arr_iter.append(f)
+    if n<=1023:
+        start_recursive=time.time()
+        F=recursive_2(n-1)
+        end_recursive=time.time()
+        print("Результат вычисления функции с использованием рекурсии: ", F, "\nВремя работы: ", end_recursive-start_recursive)
+        for i in range(3, n+1, p):
+            start_rec2=time.time()
+            f=recursive_2(i-1)
+            end_rec2=time.time()
+            arr_times_rec.append(end_rec2-start_rec2)
+            arr_rec.append(f)
+    else:
+        print("n>1023 и n-нечетное, поэтому рекурсивно вычислить значение функции невозможно")
+if n>2 and n%2==0: #если n - четное, F(n)=F(n-2)*(n-1)
+    n_values=list(range(4, n+1, p))
+    print("n - четное. Вычисляется значение функции F(n)=F(n-2)*(n-1)")
+    F=iter_1(n)
+    end_iterative=time.time()
+    print("Результат вычисления функции с использованием итерации: ", F, "\nВремя работы: ", end_iterative-start_iterative)
+    for i in range(4, n+1, p):
+        start_iter1=time.time()
+        f=iter_1(i)
+        end_iter1=time.time()
+        arr_times_iter.append(end_iter1-start_iter1)
+        arr_iter.append(f)
+    if n<=2048:
+        start_recursive=time.time()
+        F=recursive_1(n)
+        end_recursive=time.time()
+        print("Результат вычисления функции с использованием рекурсии: ", F, "\nВремя работы: ", end_recursive-start_recursive)
+        for j in range(4, n+1, p):
+            start_rec1=time.time()
+            f=recursive_1(j)
+            end_rec1=time.time()
+            arr_times_rec.append(end_rec1-start_rec1)
+            arr_rec.append(f)
+    else: 
+        print("n>2048 и n-четное, поэтому рекурсивно вычислить значение функции невозможно")
+if n in n_values: #последнее значение меняем на уже вычисленное выше, чтобы тоже отобразить его в таблице при данном n
+    arr_times_iter[-1]=end_iterative-start_iterative
+if (n%2==0 and 2<n<=2048) or (n%2!=0 and 2<n<=1023):
+    if n in n_values:
+        arr_times_rec[-1]=end_recursive-start_recursive
+    plt.plot(n_values, arr_times_rec, label="Рекурсия")
+plt.plot(n_values, arr_times_iter, label="Итерация") #вывод соответствующих графиков на экран
+plt.title("Графики зависимости времени вычисления функций от n")
+plt.xlabel("Значения n")
+plt.ylabel("Время в секундах")
+plt.legend()
+#создание и вывод таблицы на экран 
+print("Сравнение времени для итерации и рекурсии в зависимости от n, для удобства и более "
+      "наглядного представления таблицы и графиков, берем n с шагом {0} до значения {1}. Если "
+      "при n={1} нет значений времени, смотрите вывод выше".format(str(p), str(n)))
+print("*","="*65,"*", sep='')
+tabulate_arr=[arr_times_iter, arr_times_rec]
+print("| n".ljust(15), "Время итерации".ljust(23), "  Время рекурсии".ljust(25),"|")
+print("|","="*64,"=|", sep='')
+rec_none="No"
+for j in range(len(arr_times_iter)):
+    if (n%2==0 and 2<n<=2048) or (n%2!=0 and 2<n<=1023):
+        print(f'| {n_values[j]:<12} | {tabulate_arr[0][j]:<23} | {tabulate_arr[1][j]:<23}|')
+    if n>2048:
+        print(f'| {n_values[j]:<12} | {tabulate_arr[0][j]:<23} | {rec_none:<23}|')
+print("*","="*65,"*", sep='')
+plt.show()
