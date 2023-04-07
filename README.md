@@ -5,7 +5,8 @@
 29. F(1) = F(2) = -100, F(n) = F(n-2)*(n-1), при четных n > 1, F(n) =(n-1)! при нечетных n > 1.
 Отчет по лабораторной работе:
 
-https://disk.yandex.ru/i/i6ZrX1KpUabMGQ
+https://disk.yandex.ru/i/6UNFBXEOMUbeNw
+
 
 
 
